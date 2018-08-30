@@ -7,7 +7,7 @@ type Handler struct {
 	LinkHandler      func (*Message) error
 	EnterChatHandler func (*Message) error
 	UnKnowHandler    func (*Message) error
-	ShowQRHandler    func (*string) error
+	ShowQRHandler    func ([]byte) error
 }
 type wxSecret struct {
 	Host       string

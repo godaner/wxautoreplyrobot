@@ -104,7 +104,7 @@ func (wxApi *WXApi) ShowQRcodeUrl(uuid string) error {
 		*qrStrP = M.Content
 	}
 
-	err=wxApi.handler.ShowQRHandler(qrStrP)
+	err=wxApi.handler.ShowQRHandler(httpbyte)
 
 	if err!=nil{
 		return err
@@ -513,12 +513,14 @@ func (wxApi *WXApi) Listening() error {
 		case SYSNC_STATUS_RETCODE_LOGIN_WEB:
 			return errors.New("从其它设备上登了网页微信")
 		case SYSNC_STATUS_RETCODE_NORMAL:
-			return wxApi.handleSysncRetCodeNormal(syncStatus)
+			err:=wxApi.handleSysncRetCodeNormal(syncStatus)
+			if err!=nil{
+				log.Printf("handleSysncRetCodeNormal err , err is : %s", err.Error())
+			}
 		case SYSNC_STATUS_RETCODE_ERROR:
-			return fmt.Errorf("Sync Error %+v", syncStatus)
+			fmt.Errorf("Sync Error %+v", syncStatus)
 		default:
 			log.Printf("sync check Unknow Code: %+v", syncStatus)
-
 		}
 
 	}

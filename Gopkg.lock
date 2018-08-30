@@ -43,11 +43,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8a78b3543c4eaef0306de95593d3d289bfdff2059aa15e195c85846a475d1b5e"
+  digest = "1:76fa3e58c135ca35b174c967430558354a301f55b7377f613314b92a629cefa3"
   name = "github.com/godaner/wxrobot"
   packages = ["."]
   pruneopts = "UT"
-  revision = "5334462f0fb3d0845d9a8e727741285e936a1188"
+  revision = "f43ffa2594320ec6051a46bfbc9cb113bcf181bf"
 
 [[projects]]
   branch = "master"

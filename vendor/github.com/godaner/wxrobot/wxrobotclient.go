@@ -28,7 +28,7 @@ func StartClient() error {
 	if err != nil {
 		return err
 	}
-	err = wxApi.Listening()
+	err = wxApi.Listening()//if throw a err , it is mean : need refresh qr
 	if err != nil {
 		return err
 	}

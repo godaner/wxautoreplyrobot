@@ -5,17 +5,13 @@ import (
 	"github.com/larspensjo/config"
 	"wxautoreplyrobot"
 	"log"
-	"github.com/skip2/go-qrcode"
 	"bytes"
-	"image/jpeg"
 	"encoding/base64"
-	"strings"
-	"net/smtp"
 	"github.com/godaner/wxrobot"
 	"gopkg.in/gomail.v2"
 )
 
-func TextHandler(msg *wxrobot.Message) {
+func TextHandler(msg *wxrobot.Message) error {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println(err)
@@ -26,19 +22,20 @@ func TextHandler(msg *wxrobot.Message) {
 	reply, err := c.String("msg", msg.Content)
 	if err != nil {
 		//log.Println("textHandler : get reply is err ! err is : ",err)
-		return
+		return nil
 	}
 	if reply == "" {
-		return
+		return nil
 	}
-	wxrobot.SendMsg(msg.FromUserName, reply)
+
+	return wxrobot.SendMsg(msg.FromUserName, reply)
 }
-func ShowQRHandler(qrStrP *string) {
+func ShowQRHandler(qrbyte []byte ) error{
 	if wxautoreplyrobot.Email == ""{
-		return
+		return nil
 	}
 	////qr page////
-	base64qr, _ := generateQRBase64(*qrStrP, 256)
+	base64qr, _ := generateQRBase64(qrbyte, 256)
 	content := `
 	<!DOCTYPE html>
 <html lang="en">
@@ -47,7 +44,7 @@ func ShowQRHandler(qrStrP *string) {
     <title>wxrobot login</title>
 </head>
 <body>
-	Please scan this qr to login wxhandler:<br/>
+	Please scan this qr to login wxrobot:<br/>
 	<img src="` + base64qr + `"/>
 </body>
 </html>
@@ -74,37 +71,10 @@ func ShowQRHandler(qrStrP *string) {
 	}else {
 		log.Printf("Send qr emial to %s success ! ",wxautoreplyrobot.Email)
 	}
+	return nil
 }
-func generateQRBase64(qrCode string, size int) (string, error) {
-	if size <= 0 {
-		size = 250
-	}
-	q, err := qrcode.New(qrCode, qrcode.Medium)
-	if err != nil {
-		return "", err
-	}
-	image := q.Image(size)
-	if err != nil {
-		return "", err
-	}
+func generateQRBase64(qrbyte []byte, size int) (string, error) {
 	//image to base 64
-	emptyBuff := bytes.NewBuffer(nil)
-	jpeg.Encode(emptyBuff, image, nil)
-
-	return "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(emptyBuff.Bytes()), nil
-}
-func sendToMail(user, password, host, to, subject, body, mailtype string) error {
-	hp := strings.Split(host, ":")
-	auth := smtp.PlainAuth("", user, password, hp[0])
-	var content_type string
-	if mailtype == "html" {
-		content_type = "Content-Type: text/" + mailtype + "; charset=UTF-8"
-	} else {
-		content_type = "Content-Type: text/plain" + "; charset=UTF-8"
-	}
-
-	msg := []byte("To: " + to + "\r\nFrom: " + user + ">\r\nSubject: " + "\r\n" + content_type + "\r\n\r\n" + body)
-	send_to := strings.Split(to, ";")
-	err := smtp.SendMail(host, auth, user, send_to, msg)
-	return err
+	buf := bytes.NewBuffer(qrbyte)
+	return "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
