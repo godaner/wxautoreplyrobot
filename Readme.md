@@ -17,9 +17,10 @@ git clone https://github.com/godaner/wxautoreplyrobot.git
 hello: hello , i am godaner !
 
 explain:
+	*.you don't need create this file , program will create it auto.
 	*.it is a demo reply config
 	*.don't change node [msg].
-    *.if anyone send "hello" to you , your wxrobot will response "hello , i am godaner !" to him auto.
+     *.if anyone send "hello" to you , your wxrobot will response "hello , i am godaner !" to him auto.
 ```
 
 
@@ -29,7 +30,7 @@ explain:
 ​		
 
 ```
-cd ${GOPATH}/src/wxautoreplyrobot
+cd ${GOPATH}/src/wxautoreplyrobot/cmd
 go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg
 if you wanna run wxrobot in background:
 	nohup go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg >wxautoreplyrobot.log 2>&1 & 
