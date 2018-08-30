@@ -1,4 +1,4 @@
-package handler
+package webhandler
 
 import (
 	"github.com/godaner/go-route/route"

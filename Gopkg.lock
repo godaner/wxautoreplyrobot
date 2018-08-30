@@ -26,14 +26,6 @@
   revision = "68117e6bbede4dd72d70c7a58d73348ead068509"
 
 [[projects]]
-  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
-  name = "github.com/go-gomail/gomail"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
-  version = "2.0.0"
-
-[[projects]]
   branch = "master"
   digest = "1:bc093d75c1b37877e777540c794fa39bde3fcffa0980a13855388d04e78dffab"
   name = "github.com/godaner/go-route"
@@ -129,6 +121,14 @@
   revision = "2caba252f4dc53eaf6b553000885530023f54623"
 
 [[projects]]
+  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
+  name = "gopkg.in/gomail.v2"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
+  version = "2.0.0"
+
+[[projects]]
   digest = "1:10aaee8ca3ebf2edad8e33398da918b7948f541cd372ff1a8948f724cfd4610f"
   name = "rsc.io/qr"
   packages = [
@@ -143,12 +143,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/go-gomail/gomail",
     "github.com/godaner/go-route/route",
     "github.com/godaner/go-util",
     "github.com/godaner/wxrobot",
     "github.com/larspensjo/config",
     "github.com/skip2/go-qrcode",
+    "gopkg.in/gomail.v2",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
