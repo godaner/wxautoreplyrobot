@@ -1,5 +1,5 @@
 package wxrobot
-type MessageHandler struct {
+type Handler struct {
 	TextHandler      func (*Message)
 	ImgHandler       func (*Message)
 	VoiceHandler     func (*Message)
@@ -7,6 +7,7 @@ type MessageHandler struct {
 	LinkHandler      func (*Message)
 	EnterChatHandler func (*Message)
 	UnKnowHandler    func (*Message)
+	ShowQRHandler    func (*string)
 }
 type wxSecret struct {
 	Host       string

@@ -23,27 +23,27 @@ const (
 
 )
 
-type WXRobot struct {
-	httpClient     *Client
-	secret         *wxSecret
-	baseRequest    *BaseRequest
-	user           *User
-	contacts       map[string]*User
-	messageHandler *MessageHandler
+type WXApi struct {
+	httpClient  *Client
+	secret      *wxSecret
+	baseRequest *BaseRequest
+	user        *User
+	contacts    map[string]*User
+	handler     *Handler
 }
 
-func NewWeixin(messageHandler *MessageHandler) *WXRobot {
-	return &WXRobot{
-		httpClient:     NewClient(),
-		secret:         &wxSecret{},
-		baseRequest:    &BaseRequest{},
-		user:           &User{},
-		messageHandler: messageHandler,
+func NewWXApi() *WXApi {
+	return &WXApi{
+		httpClient:  NewClient(),
+		secret:      &wxSecret{},
+		baseRequest: &BaseRequest{},
+		user:        &User{},
+		handler:     &Handler{},
 	}
 }
 
-func (wxRobot *WXRobot) GetUser(userName string) (*User, error) {
-	u, ok := wxRobot.contacts[userName]
+func (wxApi *WXApi) GetUser(userName string) (*User, error) {
+	u, ok := wxApi.contacts[userName]
 	if ok {
 		return u, nil
 	} else {
@@ -51,8 +51,8 @@ func (wxRobot *WXRobot) GetUser(userName string) (*User, error) {
 	}
 }
 
-func (wxRobot *WXRobot) GetUserName(userName string) string {
-	u, err := wxRobot.GetUser(userName)
+func (wxApi *WXApi) GetUserName(userName string) string {
+	u, err := wxApi.GetUser(userName)
 	if err != nil {
 		return "[myself]"
 	}
@@ -63,14 +63,14 @@ func (wxRobot *WXRobot) GetUserName(userName string) string {
 	}
 }
 
-func (wxRobot *WXRobot) getUuid() (string, error) {
+func (wxApi *WXApi) getUuid() (string, error) {
 	values := &url.Values{}
 	values.Set("appid", "wx782c26e4c19acffb")
 	values.Set("fun", "new")
 	values.Set("lang", "zh_CN")
 	values.Set("_", TimestampStr())
 	uri := fmt.Sprintf("%s/jslogin", LOGIN_URL)
-	b, err := wxRobot.httpClient.Get(uri, values)
+	b, err := wxApi.httpClient.Get(uri, values)
 	if err != nil {
 		return "", err
 	}
@@ -83,7 +83,7 @@ func (wxRobot *WXRobot) getUuid() (string, error) {
 	}
 }
 
-func (wxRobot *WXRobot) ShowQRcodeUrl(uuid string) error {
+func (wxApi *WXApi) ShowQRcodeUrl(uuid string) error {
 	//qr url
 	qrStr := fmt.Sprintf("%s/qrcode/%s", LOGIN_URL, uuid)
 
@@ -104,10 +104,12 @@ func (wxRobot *WXRobot) ShowQRcodeUrl(uuid string) error {
 		*qrStrP = M.Content
 	}
 
+	wxApi.handler.ShowQRHandler(qrStrP)
+
 	return nil
 }
 
-func (wxRobot *WXRobot) WaitingForLoginConfirm(uuid string) (string, error) {
+func (wxApi *WXApi) WaitingForLoginConfirm(uuid string) (string, error) {
 	re := regexp.MustCompile(`window.code=([0-9]*);`)
 	tip := "1"
 	for {
@@ -115,7 +117,7 @@ func (wxRobot *WXRobot) WaitingForLoginConfirm(uuid string) (string, error) {
 		values.Set("uuid", uuid)
 		values.Set("tip", tip)
 		values.Set("_", TimestampStr())
-		b, err := wxRobot.httpClient.Get("https://login.wx.qq.com/cgi-bin/mmwebwx-bin/login", values)
+		b, err := wxApi.httpClient.Get("https://login.wx.qq.com/cgi-bin/mmwebwx-bin/login", values)
 		if err != nil {
 			log.Printf("HTTP GET err: %s", err.Error())
 			return "", err
@@ -171,22 +173,22 @@ func findTicket(s string) (*ticket, error) {
 	}, nil
 }
 
-func (wxRobot *WXRobot) NewLoginPage(newLoginUri string) error {
-	b, err := wxRobot.httpClient.Get(newLoginUri+"&fun=new", nil)
+func (wxApi *WXApi) NewLoginPage(newLoginUri string) error {
+	b, err := wxApi.httpClient.Get(newLoginUri+"&fun=new", nil)
 	if err != nil {
 		log.Printf("HTTP GET err: %s", err.Error())
 		return err
 	}
-	err = xml.Unmarshal(b, wxRobot.secret)
+	err = xml.Unmarshal(b, wxApi.secret)
 	if err != nil {
 		log.Printf("parse wxSecret from xml failed: %v", err)
 		return err
 	}
-	if wxRobot.secret.Code == "0" {
+	if wxApi.secret.Code == "0" {
 		u, _ := url.Parse(newLoginUri)
-		wxRobot.secret.BaseUri = newLoginUri[:strings.LastIndex(newLoginUri, "/")]
-		wxRobot.secret.Host = u.Host
-		wxRobot.secret.DeviceID = "e" + RandNumbers(15)
+		wxApi.secret.BaseUri = newLoginUri[:strings.LastIndex(newLoginUri, "/")]
+		wxApi.secret.Host = u.Host
+		wxApi.secret.DeviceID = "e" + RandNumbers(15)
 		return nil
 	} else {
 		return errors.New("Get wxSecret Error")
@@ -194,20 +196,20 @@ func (wxRobot *WXRobot) NewLoginPage(newLoginUri string) error {
 
 }
 
-func (wxRobot *WXRobot) Init() error {
+func (wxApi *WXApi) Init() error {
 	values := &url.Values{}
 	values.Set("r", TimestampStr())
 	values.Set("lang", "en_US")
-	values.Set("pass_ticket", wxRobot.secret.PassTicket)
-	url := fmt.Sprintf("%s/webwxinit?%s", wxRobot.secret.BaseUri, values.Encode())
-	wxRobot.baseRequest = &BaseRequest{
-		Uin:      wxRobot.secret.Uin,
-		Sid:      wxRobot.secret.Sid,
-		Skey:     wxRobot.secret.Skey,
-		DeviceID: wxRobot.secret.DeviceID,
+	values.Set("pass_ticket", wxApi.secret.PassTicket)
+	url := fmt.Sprintf("%s/webwxinit?%s", wxApi.secret.BaseUri, values.Encode())
+	wxApi.baseRequest = &BaseRequest{
+		Uin:      wxApi.secret.Uin,
+		Sid:      wxApi.secret.Sid,
+		Skey:     wxApi.secret.Skey,
+		DeviceID: wxApi.secret.DeviceID,
 	}
-	b, err := wxRobot.httpClient.PostJson(url, map[string]interface{}{
-		"BaseRequest": wxRobot.baseRequest,
+	b, err := wxApi.httpClient.PostJson(url, map[string]interface{}{
+		"BaseRequest": wxApi.baseRequest,
 	})
 	if err != nil {
 		log.Printf("HTTP GET err: %s", err.Error())
@@ -219,32 +221,32 @@ func (wxRobot *WXRobot) Init() error {
 		return err
 	}
 	if r.BaseResponse.Ret == 0 {
-		wxRobot.user = r.User
-		wxRobot.updateSyncKey(r.SyncKey)
+		wxApi.user = r.User
+		wxApi.updateSyncKey(r.SyncKey)
 		return nil
 	}
 	return fmt.Errorf("Init error: %+v", r.BaseResponse)
 }
 
-func (wxRobot *WXRobot) updateSyncKey(s *SyncKey) {
-	wxRobot.secret.SyncKey = s
+func (wxApi *WXApi) updateSyncKey(s *SyncKey) {
+	wxApi.secret.SyncKey = s
 	syncKeys := make([]string, s.Count)
 	for n, k := range s.List {
 		syncKeys[n] = fmt.Sprintf("%d_%d", k.Key, k.Val)
 	}
-	wxRobot.secret.SyncKeyStr = strings.Join(syncKeys, "|")
+	wxApi.secret.SyncKeyStr = strings.Join(syncKeys, "|")
 }
 
-func (wxRobot *WXRobot) GetNewLoginUrl() (string, error) {
-	uuid, err := wxRobot.getUuid()
+func (wxApi *WXApi) GetNewLoginUrl() (string, error) {
+	uuid, err := wxApi.getUuid()
 	if err != nil {
 		return "", err
 	}
-	err = wxRobot.ShowQRcodeUrl(uuid)
+	err = wxApi.ShowQRcodeUrl(uuid)
 	if err != nil {
 		return "", err
 	}
-	newLoginUri, err := wxRobot.WaitingForLoginConfirm(uuid)
+	newLoginUri, err := wxApi.WaitingForLoginConfirm(uuid)
 	if err != nil {
 		return "", err
 	}
@@ -252,25 +254,25 @@ func (wxRobot *WXRobot) GetNewLoginUrl() (string, error) {
 }
 
 
-func (wxRobot *WXRobot) StatusNotify() error {
+func (wxApi *WXApi) StatusNotify() error {
 	values := &url.Values{}
 	values.Set("lang", "zh_CN")
-	values.Set("pass_ticket", wxRobot.secret.PassTicket)
-	url := fmt.Sprintf("%s/webwxstatusnotify?%s", wxRobot.secret.BaseUri, values.Encode())
-	b, err := wxRobot.httpClient.PostJson(url, map[string]interface{}{
-		"BaseRequest":  wxRobot.baseRequest,
+	values.Set("pass_ticket", wxApi.secret.PassTicket)
+	url := fmt.Sprintf("%s/webwxstatusnotify?%s", wxApi.secret.BaseUri, values.Encode())
+	b, err := wxApi.httpClient.PostJson(url, map[string]interface{}{
+		"BaseRequest":  wxApi.baseRequest,
 		"code":         3,
-		"FromUserName": wxRobot.user.UserName,
-		"ToUserName":   wxRobot.user.UserName,
+		"FromUserName": wxApi.user.UserName,
+		"ToUserName":   wxApi.user.UserName,
 		"ClientMsgId":  TimestampMicroSecond(),
 	})
 	if err != nil {
 		return err
 	}
-	return wxRobot.CheckCode(b, "Status Notify error")
+	return wxApi.CheckCode(b, "Status Notify error")
 }
 
-func (wxRobot *WXRobot) CheckCode(b []byte, errmsg string) error {
+func (wxApi *WXApi) CheckCode(b []byte, errmsg string) error {
 	var r InitResponse
 	err := json.Unmarshal(b, &r)
 	if err != nil {
@@ -282,14 +284,14 @@ func (wxRobot *WXRobot) CheckCode(b []byte, errmsg string) error {
 	return nil
 }
 
-func (wxRobot *WXRobot) GetContacts() error {
+func (wxApi *WXApi) GetContacts() error {
 	values := &url.Values{}
 	values.Set("seq", "0")
-	values.Set("pass_ticket", wxRobot.secret.PassTicket)
-	values.Set("skey", wxRobot.secret.Skey)
+	values.Set("pass_ticket", wxApi.secret.PassTicket)
+	values.Set("skey", wxApi.secret.Skey)
 	values.Set("r", TimestampStr())
-	url := fmt.Sprintf("%s/webwxgetcontact?%s", wxRobot.secret.BaseUri, values.Encode())
-	b, err := wxRobot.httpClient.PostJson(url, map[string]interface{}{})
+	url := fmt.Sprintf("%s/webwxgetcontact?%s", wxApi.secret.BaseUri, values.Encode())
+	b, err := wxApi.httpClient.PostJson(url, map[string]interface{}{})
 	if err != nil {
 		return err
 	}
@@ -302,22 +304,22 @@ func (wxRobot *WXRobot) GetContacts() error {
 		return errors.New("Get Contacts error")
 	}
 	log.Printf("update %d contacts", r.MemberCount)
-	wxRobot.contacts = make(map[string]*User, r.MemberCount)
-	return wxRobot.updateContacts(r.MemberList)
+	wxApi.contacts = make(map[string]*User, r.MemberCount)
+	return wxApi.updateContacts(r.MemberList)
 }
 
-func (wxRobot *WXRobot) updateContacts(us []*User) error {
+func (wxApi *WXApi) updateContacts(us []*User) error {
 	for _, u := range us {
-		wxRobot.contacts[u.UserName] = u
+		wxApi.contacts[u.UserName] = u
 		log.Printf("%s => %s", u.UserName, u.NickName)
 	}
 	return nil
 }
 
-func (wxRobot *WXRobot) TestSyncCheck() error {
+func (wxApi *WXApi) TestSyncCheck() error {
 	for _, h := range []string{"webpush.", "webpush2."} {
-		wxRobot.secret.PushHost = h + wxRobot.secret.Host
-		syncStatus, err := wxRobot.SyncCheck()
+		wxApi.secret.PushHost = h + wxApi.secret.Host
+		syncStatus, err := wxApi.SyncCheck()
 		if err == nil {
 			if syncStatus.Retcode == "0" {
 				return nil
@@ -327,18 +329,18 @@ func (wxRobot *WXRobot) TestSyncCheck() error {
 	return errors.New("Test SyncCheck error")
 }
 
-func (wxRobot *WXRobot) SyncCheck() (*SyncStatus, error) {
-	uri := fmt.Sprintf("https://%s/cgi-bin/mmwebwx-bin/synccheck", wxRobot.secret.PushHost)
+func (wxApi *WXApi) SyncCheck() (*SyncStatus, error) {
+	uri := fmt.Sprintf("https://%s/cgi-bin/mmwebwx-bin/synccheck", wxApi.secret.PushHost)
 	values := &url.Values{}
 	values.Set("r", TimestampStr())
-	values.Set("sid", wxRobot.secret.Sid)
-	values.Set("uin", strconv.FormatInt(wxRobot.secret.Uin, 10))
-	values.Set("skey", wxRobot.secret.Skey)
-	values.Set("deviceid", wxRobot.secret.DeviceID)
-	values.Set("synckey", wxRobot.secret.SyncKeyStr)
+	values.Set("sid", wxApi.secret.Sid)
+	values.Set("uin", strconv.FormatInt(wxApi.secret.Uin, 10))
+	values.Set("skey", wxApi.secret.Skey)
+	values.Set("deviceid", wxApi.secret.DeviceID)
+	values.Set("synckey", wxApi.secret.SyncKeyStr)
 	values.Set("_", TimestampStr())
 
-	b, err := wxRobot.httpClient.Get(uri, values)
+	b, err := wxApi.httpClient.Get(uri, values)
 	if err != nil {
 		return nil, err
 	}
@@ -353,16 +355,16 @@ func (wxRobot *WXRobot) SyncCheck() (*SyncStatus, error) {
 	return syncStatus, nil
 }
 
-func (wxRobot *WXRobot) Sync() ([]*Message, error) {
+func (wxApi *WXApi) Sync() ([]*Message, error) {
 	values := &url.Values{}
-	values.Set("sid", wxRobot.secret.Sid)
-	values.Set("skey", wxRobot.secret.Skey)
+	values.Set("sid", wxApi.secret.Sid)
+	values.Set("skey", wxApi.secret.Skey)
 	values.Set("lang", "en_US")
-	values.Set("pass_ticket", wxRobot.secret.PassTicket)
-	url := fmt.Sprintf("%s/webwxsync?%s", wxRobot.secret.BaseUri, values.Encode())
-	b, err := wxRobot.httpClient.PostJson(url, map[string]interface{}{
-		"BaseRequest": wxRobot.baseRequest,
-		"SyncKey":     wxRobot.secret.SyncKey,
+	values.Set("pass_ticket", wxApi.secret.PassTicket)
+	url := fmt.Sprintf("%s/webwxsync?%s", wxApi.secret.BaseUri, values.Encode())
+	b, err := wxApi.httpClient.PostJson(url, map[string]interface{}{
+		"BaseRequest": wxApi.baseRequest,
+		"SyncKey":     wxApi.secret.SyncKey,
 		"rr":          ^int(time.Now().Unix()) + 1,
 	})
 	if err != nil {
@@ -379,31 +381,31 @@ func (wxRobot *WXRobot) Sync() ([]*Message, error) {
 		// log.Printf("%+v", r.BaseResponse)
 		return nil, errors.New("sync error")
 	}
-	wxRobot.updateSyncKey(r.SyncKey)
+	wxApi.updateSyncKey(r.SyncKey)
 	return r.MsgList, nil
 }
 
-func (wxRobot *WXRobot) HandleMsgs(ms []*Message) {
+func (wxApi *WXApi) HandleMsgs(ms []*Message) {
 	for _, m := range ms {
-		wxRobot.HandleMsg(m)
+		wxApi.HandleMsg(m)
 	}
 }
 
-func (wxRobot *WXRobot) SendMsgToMyself(msg string) error {
-	return wxRobot.SendMsg(wxRobot.user.UserName, msg)
+func (wxApi *WXApi) SendMsgToMyself(msg string) error {
+	return wxApi.SendMsg(wxApi.user.UserName, msg)
 }
 
-func (wxRobot *WXRobot) SendMsg(userName, msg string) error {
+func (wxApi *WXApi) SendMsg(userName, msg string) error {
 	values := &url.Values{}
-	values.Set("pass_ticket", wxRobot.secret.PassTicket)
-	url := fmt.Sprintf("%s/webwxsendmsg?%s", wxRobot.secret.BaseUri, values.Encode())
+	values.Set("pass_ticket", wxApi.secret.PassTicket)
+	url := fmt.Sprintf("%s/webwxsendmsg?%s", wxApi.secret.BaseUri, values.Encode())
 	msgId := fmt.Sprintf("%d%s", Timestamp()*1000, RandNumbers(4))
-	b, err := wxRobot.httpClient.PostJson(url, map[string]interface{}{
-		"BaseRequest": wxRobot.baseRequest,
+	b, err := wxApi.httpClient.PostJson(url, map[string]interface{}{
+		"BaseRequest": wxApi.baseRequest,
 		"Msg": map[string]interface{}{
 			"Type":         1,
 			"Content":      msg,
-			"FromUserName": wxRobot.user.UserName,
+			"FromUserName": wxApi.user.UserName,
 			"ToUserName":   userName,
 			"LocalID":      msgId,
 			"ClientMsgId":  msgId,
@@ -413,7 +415,7 @@ func (wxRobot *WXRobot) SendMsg(userName, msg string) error {
 	if err != nil {
 		return err
 	}
-	return wxRobot.CheckCode(b, "发送消息失败")
+	return wxApi.CheckCode(b, "发送消息失败")
 }
 
 var (
@@ -436,41 +438,41 @@ var (
 	}
 )
 
-func (wxRobot *WXRobot) HandleMsg(m *Message) {
-	log.Printf("[%s] from %s to %s : %s", MSG_TYPE_MAP[m.MsgType], wxRobot.GetUserName(m.FromUserName), wxRobot.GetUserName(m.ToUserName), m.Content)
+func (wxApi *WXApi) HandleMsg(m *Message) {
+	log.Printf("[%s] from %s to %s : %s", MSG_TYPE_MAP[m.MsgType], wxApi.GetUserName(m.FromUserName), wxApi.GetUserName(m.ToUserName), m.Content)
 	switch m.MsgType {
 	case MSG_TEXT: // 文本消息
-		if wxRobot.messageHandler.TextHandler != nil {
-			wxRobot.messageHandler.TextHandler(m)
+		if wxApi.handler.TextHandler != nil {
+			wxApi.handler.TextHandler(m)
 		}
 	case MSG_IMG: // 图片消息
-		if wxRobot.messageHandler.ImgHandler != nil {
-			wxRobot.messageHandler.ImgHandler(m)
+		if wxApi.handler.ImgHandler != nil {
+			wxApi.handler.ImgHandler(m)
 		}
 	case MSG_VOICE: // 语音消息
-		if wxRobot.messageHandler.VoiceHandler != nil {
-			wxRobot.messageHandler.VoiceHandler(m)
+		if wxApi.handler.VoiceHandler != nil {
+			wxApi.handler.VoiceHandler(m)
 		}
 	case MSG_FACE_0: // 表情消息
-		if wxRobot.messageHandler.FaceHandler != nil {
-			wxRobot.messageHandler.FaceHandler(m)
+		if wxApi.handler.FaceHandler != nil {
+			wxApi.handler.FaceHandler(m)
 		}
 	case MSG_FACE_1: // 表情消息
-		if wxRobot.messageHandler.FaceHandler != nil {
-			wxRobot.messageHandler.FaceHandler(m)
+		if wxApi.handler.FaceHandler != nil {
+			wxApi.handler.FaceHandler(m)
 		}
 	case MSG_LINK: // 链接消息
-		if wxRobot.messageHandler.LinkHandler != nil {
-			wxRobot.messageHandler.LinkHandler(m)
+		if wxApi.handler.LinkHandler != nil {
+			wxApi.handler.LinkHandler(m)
 		}
 	case MSG_ENTER_CHAT: // 用户在手机进入某个联系人聊天界面时收到的消息
-		if wxRobot.messageHandler.EnterChatHandler != nil {
-			wxRobot.messageHandler.EnterChatHandler(m)
+		if wxApi.handler.EnterChatHandler != nil {
+			wxApi.handler.EnterChatHandler(m)
 		}
 	default:
 
-		if wxRobot.messageHandler.UnKnowHandler != nil {
-			wxRobot.messageHandler.UnKnowHandler(m)
+		if wxApi.handler.UnKnowHandler != nil {
+			wxApi.handler.UnKnowHandler(m)
 		}
 	}
 
@@ -485,13 +487,13 @@ const (
 	SYSNC_STATUS_SELECTOR_HAVE_UPDATE          = "2"
 )
 
-func (wxRobot *WXRobot) Listening() error {
-	err := wxRobot.TestSyncCheck()
+func (wxApi *WXApi) Listening() error {
+	err := wxApi.TestSyncCheck()
 	if err != nil {
 		return err
 	}
 	for {
-		syncStatus, err := wxRobot.SyncCheck()
+		syncStatus, err := wxApi.SyncCheck()
 		if err != nil {
 			log.Printf("sync check error: %s", err.Error())
 			time.Sleep(3 * time.Second)
@@ -503,7 +505,7 @@ func (wxRobot *WXRobot) Listening() error {
 		case SYSNC_STATUS_RETCODE_LOGIN_WEB:
 			return errors.New("从其它设备上登了网页微信")
 		case SYSNC_STATUS_RETCODE_NORMAL:
-			handleSysncRetCodeNormal(syncStatus)
+			wxApi.handleSysncRetCodeNormal(syncStatus)
 		case SYSNC_STATUS_RETCODE_ERROR:
 			return fmt.Errorf("Sync Error %+v", syncStatus)
 		default:
@@ -513,49 +515,49 @@ func (wxRobot *WXRobot) Listening() error {
 
 	}
 }
-func handleSysncRetCodeNormal(syncStatus *SyncStatus){
+func (wxApi *WXApi)handleSysncRetCodeNormal(syncStatus *SyncStatus){
 	switch syncStatus.Selector {
 	case SYSNC_STATUS_SELECTOR_NO_UPDATE:
 		break
 	case SYSNC_STATUS_SELECTOR_HAVE_UPDATE:
-		ms, err := wxRobot.Sync()
+		ms, err := wxApi.Sync()
 		if err != nil {
 			log.Printf("sync err: %s", err.Error())
 		}
-		wxRobot.HandleMsgs(ms)
+		wxApi.HandleMsgs(ms)
 	default:
 		log.Printf("New Message, Unknow type: %+v", syncStatus)
-		_, err := wxRobot.Sync()
+		_, err := wxApi.Sync()
 		if err != nil {
 
 		}
 	}
 }
 
-func (wxRobot *WXRobot) Start() error {
-	newLoginUri, err := wxRobot.GetNewLoginUrl()
+func (wxApi *WXApi) Start() error {
+	newLoginUri, err := wxApi.GetNewLoginUrl()
 	if err != nil {
 		return err
 	}
 
-	err = wxRobot.NewLoginPage(newLoginUri)
+	err = wxApi.NewLoginPage(newLoginUri)
 	if err != nil {
 		return err
 	}
 
-	err = wxRobot.Init()
+	err = wxApi.Init()
 	if err != nil {
 		return err
 	}
 
-	err = wxRobot.StatusNotify()
+	err = wxApi.StatusNotify()
 	if err != nil {
 		return err
 	}
 
-	err = wxRobot.GetContacts()
+	err = wxApi.GetContacts()
 	if err != nil {
 		return err
 	}
-	return wxRobot.Listening()
+	return wxApi.Listening()
 }

@@ -26,6 +26,14 @@
   revision = "68117e6bbede4dd72d70c7a58d73348ead068509"
 
 [[projects]]
+  digest = "1:eebd52aee67d9f1e0af1859a584e14b1817581dd5f90d4585418c27b6a93c966"
+  name = "github.com/go-gomail/gomail"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
+  version = "2.0.0"
+
+[[projects]]
   branch = "master"
   digest = "1:bc093d75c1b37877e777540c794fa39bde3fcffa0980a13855388d04e78dffab"
   name = "github.com/godaner/go-route"
@@ -43,11 +51,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6f93eb8aa238e7e115b5ee18b3a694156c419f3493aed26d5d153c833e11736e"
+  digest = "1:467fe524dd39de2c5a4cc1c37de31ffed2b3d6e46ab9a73d32b60ebafd1ebd76"
   name = "github.com/godaner/wxrobot"
   packages = ["."]
   pruneopts = "UT"
-  revision = "01f856e72311560589273e80111a249fa41d6a0a"
+  revision = "23542fb51622b32c2c4b3b8dc660610df3f69125"
 
 [[projects]]
   branch = "master"
@@ -94,11 +102,31 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:bf1cb2d456a753d515d90e43c4b05afa4837e75d7808d1752607b91007ce25bb"
+  name = "github.com/skip2/go-qrcode"
+  packages = [
+    ".",
+    "bitset",
+    "reedsolomon",
+  ]
+  pruneopts = "UT"
+  revision = "cf5f9fa2f0d847edb8e038db7ed975e239095e1a"
+
+[[projects]]
+  branch = "master"
   digest = "1:9ac241cddecd5a8f687864afd2896f8ada6b5d771c0976d64060ba86d66482e4"
   name = "github.com/tuotoo/qrcode"
   packages = ["."]
   pruneopts = "UT"
   revision = "6cbfb834f9f328f3d3c2e44a50cdcaa330466e4c"
+
+[[projects]]
+  branch = "v3"
+  digest = "1:7388652e2215a3f45d341d58766ed58317971030eb1cbd75f005f96ace8e9196"
+  name = "gopkg.in/alexcesaro/quotedprintable.v3"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "2caba252f4dc53eaf6b553000885530023f54623"
 
 [[projects]]
   digest = "1:10aaee8ca3ebf2edad8e33398da918b7948f541cd372ff1a8948f724cfd4610f"
@@ -115,10 +143,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/go-gomail/gomail",
     "github.com/godaner/go-route/route",
     "github.com/godaner/go-util",
     "github.com/godaner/wxrobot",
     "github.com/larspensjo/config",
+    "github.com/skip2/go-qrcode",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
