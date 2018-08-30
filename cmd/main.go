@@ -7,7 +7,7 @@ import (
 	"github.com/larspensjo/config"
 	"fmt"
 	"wxautoreplyrobot"
-	"go-util"
+	"github.com/godaner/go-util"
 	"os"
 	"github.com/godaner/go-route/route"
 	"wxautoreplyrobot/handler"
