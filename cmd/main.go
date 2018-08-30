@@ -43,20 +43,17 @@ func main() {
 	//run
 	go route.Start(wxautoreplyrobot.Addr)
 
-	isLogin := false
 	//// wxrobot ////
 	for{
-		isLogin = false
-		for !isLogin{//refresh qr
+		for {//show login qr and get contact list
 			err0 := wxrobot.Init(&wxrobot.MessageHandler{
 				TextHandler: textHandler,
 			})
 			if err0 != nil {
 				log.Printf(err0.Error())
-				time.Sleep(time.Minute*time.Duration(10))
 				continue
 			}
-			isLogin=true
+			break
 		}
 
 		//have login success
