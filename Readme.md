@@ -27,7 +27,7 @@ explain:
 
 ### 	run demo：
 
-​		
+#### linux：
 
 ```
 cd ${GOPATH}/src/wxautoreplyrobot/cmd
@@ -36,6 +36,13 @@ if you wanna run wxrobot in background:
 	nohup go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887>wxautoreplyrobot.log 2>&1 & 
 if you wanna see log:
 	tail -f wxautoreplyrobot.log
+```
+
+#### docker：
+
+```
+docker pull godaber/wxautoreplyrobot
+docker run -p 8887:8887 godaber/wxautoreplyrobot
 ```
 
 
