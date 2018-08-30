@@ -46,16 +46,20 @@ func main() {
 	isLogin := false
 	//// wxrobot ////
 	for{
+		isLogin = false
 		for !isLogin{//refresh qr
 			err0 := wxrobot.Init(&wxrobot.MessageHandler{
 				TextHandler: textHandler,
 			})
 			if err0 != nil {
 				log.Printf(err0.Error())
+				time.Sleep(time.Minute*time.Duration(10))
+				continue
 			}
-			time.Sleep(time.Minute*time.Duration(10))
+			isLogin=true
 		}
 
+		//have login success
 		err:=wxrobot.Listening()
 
 		if err!=nil{
