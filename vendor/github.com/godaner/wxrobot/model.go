@@ -1,13 +1,13 @@
 package wxrobot
 type Handler struct {
-	TextHandler      func (*Message)
-	ImgHandler       func (*Message)
-	VoiceHandler     func (*Message)
-	FaceHandler      func (*Message)
-	LinkHandler      func (*Message)
-	EnterChatHandler func (*Message)
-	UnKnowHandler    func (*Message)
-	ShowQRHandler    func (*string)
+	TextHandler      func (*Message) error
+	ImgHandler       func (*Message) error
+	VoiceHandler     func (*Message) error
+	FaceHandler      func (*Message) error
+	LinkHandler      func (*Message) error
+	EnterChatHandler func (*Message) error
+	UnKnowHandler    func (*Message) error
+	ShowQRHandler    func (*string) error
 }
 type wxSecret struct {
 	Host       string

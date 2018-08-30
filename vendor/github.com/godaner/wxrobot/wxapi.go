@@ -104,7 +104,11 @@ func (wxApi *WXApi) ShowQRcodeUrl(uuid string) error {
 		*qrStrP = M.Content
 	}
 
-	wxApi.handler.ShowQRHandler(qrStrP)
+	err=wxApi.handler.ShowQRHandler(qrStrP)
+
+	if err!=nil{
+		return err
+	}
 
 	return nil
 }
@@ -385,10 +389,14 @@ func (wxApi *WXApi) Sync() ([]*Message, error) {
 	return r.MsgList, nil
 }
 
-func (wxApi *WXApi) HandleMsgs(ms []*Message) {
+func (wxApi *WXApi) HandleMsgs(ms []*Message) error{
 	for _, m := range ms {
-		wxApi.HandleMsg(m)
+		err:=wxApi.HandleMsg(m)
+		if err!=nil{
+			return err
+		}
 	}
+	return nil
 }
 
 func (wxApi *WXApi) SendMsgToMyself(msg string) error {
@@ -438,7 +446,7 @@ var (
 	}
 )
 
-func (wxApi *WXApi) HandleMsg(m *Message) {
+func (wxApi *WXApi) HandleMsg(m *Message) error{
 	log.Printf("[%s] from %s to %s : %s", MSG_TYPE_MAP[m.MsgType], wxApi.GetUserName(m.FromUserName), wxApi.GetUserName(m.ToUserName), m.Content)
 	switch m.MsgType {
 	case MSG_TEXT: // 文本消息
@@ -475,7 +483,7 @@ func (wxApi *WXApi) HandleMsg(m *Message) {
 			wxApi.handler.UnKnowHandler(m)
 		}
 	}
-
+	return nil
 }
 
 const (
@@ -505,7 +513,7 @@ func (wxApi *WXApi) Listening() error {
 		case SYSNC_STATUS_RETCODE_LOGIN_WEB:
 			return errors.New("从其它设备上登了网页微信")
 		case SYSNC_STATUS_RETCODE_NORMAL:
-			wxApi.handleSysncRetCodeNormal(syncStatus)
+			return wxApi.handleSysncRetCodeNormal(syncStatus)
 		case SYSNC_STATUS_RETCODE_ERROR:
 			return fmt.Errorf("Sync Error %+v", syncStatus)
 		default:
@@ -515,7 +523,7 @@ func (wxApi *WXApi) Listening() error {
 
 	}
 }
-func (wxApi *WXApi)handleSysncRetCodeNormal(syncStatus *SyncStatus){
+func (wxApi *WXApi)handleSysncRetCodeNormal(syncStatus *SyncStatus) error{
 	switch syncStatus.Selector {
 	case SYSNC_STATUS_SELECTOR_NO_UPDATE:
 		break
@@ -524,14 +532,18 @@ func (wxApi *WXApi)handleSysncRetCodeNormal(syncStatus *SyncStatus){
 		if err != nil {
 			log.Printf("sync err: %s", err.Error())
 		}
-		wxApi.HandleMsgs(ms)
+		err=wxApi.HandleMsgs(ms)
+		if err != nil {
+			return err
+		}
 	default:
 		log.Printf("New Message, Unknow type: %+v", syncStatus)
 		_, err := wxApi.Sync()
 		if err != nil {
-
+			return err
 		}
 	}
+	return nil
 }
 
 func (wxApi *WXApi) Start() error {
