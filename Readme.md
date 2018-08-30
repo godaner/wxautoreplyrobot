@@ -31,9 +31,9 @@ explain:
 
 ```
 cd ${GOPATH}/src/wxautoreplyrobot/cmd
-go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg
+go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887
 if you wanna run wxrobot in background:
-	nohup go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg >wxautoreplyrobot.log 2>&1 & 
+	nohup go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887>wxautoreplyrobot.log 2>&1 & 
 if you wanna see log:
 	tail -f wxautoreplyrobot.log
 ```
@@ -57,5 +57,5 @@ if you wanna see log:
 
 #### web:
 
-​	visit http://127.0.0.1:80/reply/list to manage your reply msg.
+​	visit http://127.0.0.1:8887/reply/list to manage your reply msg.
 
