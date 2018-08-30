@@ -56,7 +56,7 @@ func ShowQRHandler(qrbyte []byte ) error{
 
 	m := gomail.NewMessage()
 	// 发件人
-	m.SetAddressHeader("From", "1138829222@QQ.COM", "wxrobot")
+	m.SetAddressHeader("From", wxautoreplyrobot.Email, "wxrobot")
 	// 收件人
 	m.SetHeader("To", m.FormatAddress(wxautoreplyrobot.Email, "w"))
 	// 主题
@@ -65,7 +65,7 @@ func ShowQRHandler(qrbyte []byte ) error{
 	m.SetBody("text/html", content)
 
 	// 发送邮件服务器、端口、发件人账号、发件人密码
-	d := gomail.NewPlainDialer("smtp.qq.com", 465, "1138829222@QQ.COM", "nofuhedsnzduibeb")
+	d := gomail.NewPlainDialer(wxautoreplyrobot.EmailHost, 465, wxautoreplyrobot.Email, wxautoreplyrobot.EmailPassword)
 	err := d.DialAndSend(m)
 	if  err != nil {
 		log.Printf("Send qr emial to %s err , err is : %s ! ",wxautoreplyrobot.Email,err.Error())

@@ -16,9 +16,9 @@ git clone https://github.com/godaner/wxautoreplyrobot.git
 
 ```
 cd ${GOPATH}/src/wxautoreplyrobot/cmd
-go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@.com
+go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465 godaner/wxautoreplyrobot
 if you wanna run wxrobot in background:
-	nohup go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email 1138829***@.com>wxautoreplyrobot.log 2>&1 & 
+	nohup go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465>wxautoreplyrobot.log 2>&1 & 
 if you wanna see log:
 	tail -f wxautoreplyrobot.log
 ```
@@ -27,9 +27,9 @@ if you wanna see log:
 
 ```
 docker pull godaber/wxautoreplyrobot
-docker run -p 8887:8887 -e email="38829***@.com" godaner/wxautoreplyrobot
+docker run -p 8887:8887 -e email="38829***@qq.com" -emailPassword "123" -emailHost "smtp.qq.com" -emailPort 465 godaner/wxautoreplyrobot
 if you wanna run wxrobot in background:
-	docker run -d -p 8887:8887 -e email="1138829***@.com" --name wxautoreplyrobot godaner/wxautoreplyrobot
+	docker run -d -p 8887:8887 -e email="38829***@qq.com" -emailPassword "123" -emailHost "smtp.qq.com" -emailPort 465 godaner/wxautoreplyrobot godaner/wxautoreplyrobot
 if you wanna see log:
 	docker logs -f wxautoreplyrobot
 ```
