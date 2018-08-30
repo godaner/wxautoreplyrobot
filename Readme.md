@@ -10,17 +10,22 @@ cd ${GOPATH}/src
 git clone https://github.com/godaner/wxautoreplyrobot.git
 ```
 
-### textreply.cfg：
+### about textreply.cfg：
+
+#### content：
 
 ```
 [msg]
 hello: hello , i am godaner !
+```
 
-explain:
-	*.you don't need create this file , program will create it auto.
-	*.it is a demo reply config
-	*.don't change node [msg].
-     *.if anyone send "hello" to you , your wxrobot will response "hello , i am godaner !" to him auto.
+#### explain：
+
+```
+*.you don't need create this file , program will create it auto.
+*.it is a demo reply config
+*.don't change node [msg].
+*.if anyone send "hello" to you , your wxrobot will response "hello , i am godaner !" to him auto.
 ```
 
 
