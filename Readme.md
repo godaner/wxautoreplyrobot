@@ -27,7 +27,11 @@ if you wanna see log:
 
 ```
 docker pull godaber/wxautoreplyrobot
-docker run -p 8887:8887 godaber/wxautoreplyrobot
+docker run -p 8887:8887 godaner/wxautoreplyrobot
+if you wanna run wxrobot in background:
+	docker run -d -p 8887:8887 --name wxautoreplyrobot godaner/wxautoreplyrobot
+if you wanna see log:
+	docker logs -f wxautoreplyrobot
 ```
 
 
