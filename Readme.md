@@ -27,9 +27,9 @@ if you wanna see log:
 
 ```
 docker pull godaber/wxautoreplyrobot
-docker run -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 godaner/wxautoreplyrobot
+docker run -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465  --name wxautoreplyrobot godaner/wxautoreplyrobot
 if you wanna run wxrobot in background:
-	docker run -d -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 godaner/wxautoreplyrobot
+	docker run -d -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 --name wxautoreplyrobot godaner/wxautoreplyrobot
 if you wanna see log:
 	docker logs -f wxautoreplyrobot
 ```
