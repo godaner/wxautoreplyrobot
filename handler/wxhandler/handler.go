@@ -9,6 +9,7 @@ import (
 	"encoding/base64"
 	"github.com/godaner/wxrobot"
 	"gopkg.in/gomail.v2"
+	"github.com/pkg/errors"
 )
 
 func TextHandler(msg *wxrobot.Message) error {
@@ -68,6 +69,7 @@ func ShowQRHandler(qrbyte []byte ) error{
 	err := d.DialAndSend(m)
 	if  err != nil {
 		log.Printf("Send qr emial to %s err , err is : %s ! ",wxautoreplyrobot.Email,err.Error())
+		return errors.Errorf("send email error")
 	}else {
 		log.Printf("Send qr emial to %s success ! ",wxautoreplyrobot.Email)
 	}
