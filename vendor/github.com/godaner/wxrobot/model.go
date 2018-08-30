@@ -91,3 +91,7 @@ type Message struct {
 	StatusNotifyCode     int64  `json:""StatusNotifyCode"`    //"StatusNotifyCode": 2,
 	StatusNotifyUserName string `json:"StatusNotifyUserName"` // "StatusNotifyUserName": "filehelper"
 }
+type SyncStatus struct {
+	Retcode  string
+	Selector string
+}

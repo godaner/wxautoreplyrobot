@@ -43,11 +43,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:26491d39da1f4928612ef976fe3aa47db4ea754821946017671c29cf4050bd3c"
+  digest = "1:6f93eb8aa238e7e115b5ee18b3a694156c419f3493aed26d5d153c833e11736e"
   name = "github.com/godaner/wxrobot"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8df78ccf6f223864335cfcafee8bb480a8f6bc61"
+  revision = "01f856e72311560589273e80111a249fa41d6a0a"
 
 [[projects]]
   branch = "master"
@@ -116,6 +116,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/godaner/go-route/route",
+    "github.com/godaner/go-util",
     "github.com/godaner/wxrobot",
     "github.com/larspensjo/config",
   ]

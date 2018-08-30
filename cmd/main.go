@@ -14,6 +14,9 @@ import (
 	"time"
 )
 
+const (
+	TIME_LAYOUT="2006-01-02 15:04:05"
+)
 func init(){
 	//check
 	if !go_util.FileExists(wxautoreplyrobot.TextReplyPath) {
@@ -24,8 +27,7 @@ func init(){
 		log.Println("init err : ",err)
 	}
 	if !c.HasSection("msg"){
-		timeStr := time.Now().Format("2006-01-02 15:04:05")
-		c.AddOption("msg","hello","i am wxautoreplyrobot! birthday is : "+timeStr)
+		c.AddOption("msg","hello","i am wxautoreplyrobot! birthday is : "+time.Now().Format(TIME_LAYOUT))
 	}
 	c.WriteFile(wxautoreplyrobot.TextReplyPath,os.ModeDevice,"")
 }
@@ -41,16 +43,25 @@ func main() {
 	//run
 	go route.Start(wxautoreplyrobot.Addr)
 
+	isLogin := false
 	//// wxrobot ////
-	err0 := wxrobot.Init(&wxrobot.MessageHandler{
-		TextHandler: textHandler,
-	})
-	if err0 != nil {
-		log.Fatal(err0.Error())
+	for{
+		for !isLogin{//refresh qr
+			err0 := wxrobot.Init(&wxrobot.MessageHandler{
+				TextHandler: textHandler,
+			})
+			if err0 != nil {
+				log.Printf(err0.Error())
+			}
+			time.Sleep(time.Minute*time.Duration(10))
+		}
+
+		err:=wxrobot.Listening()
+
+		if err!=nil{
+			log.Printf("wxrobot litening err , err is : %s , time is %s !",err.Error(),time.Now().Format(TIME_LAYOUT))
+		}
 	}
-
-	wxrobot.Listening()
-
 
 }
 
