@@ -5,13 +5,13 @@ import (
 
 	"github.com/godaner/go-route/route"
 	"github.com/godaner/go-util"
-	"github.com/godaner/wxrobot"
 	"github.com/larspensjo/config"
 	"os"
 	"time"
 	"wxautoreplyrobot"
 	"wxautoreplyrobot/handler/webhandler"
 	"wxautoreplyrobot/handler/wxhandler"
+	"github.com/godaner/wxrobot"
 )
 
 const (
@@ -45,22 +45,13 @@ func main() {
 	go route.Start(wxautoreplyrobot.Addr)
 
 	//// wxrobot ////
-	// forever retry show login qr
-	for {
-		for {
-			wxrobot.SetClientHandler(&wxrobot.Handler{
-				TextHandler:   wxhandler.TextHandler,
-				ShowQRHandler: wxhandler.ShowQRHandler,
-			})
-			err := wxrobot.StartClient() //will be block
-			if err != nil {
-				log.Printf("wxrobot client err , err is : %s , time is %s !", err.Error(), time.Now().Format(TIME_LAYOUT))
-				log.Printf("wxrobot client will retry print qr after %d m , pleqase wait !",wxautoreplyrobot.RefreshWhenError)
-				time.Sleep(time.Minute*time.Duration(wxautoreplyrobot.RefreshWhenError))
-				continue
-			}
-			break
-		}
+	wxrobot.SetClientHandler(&wxrobot.Handler{
+		TextHandler:   wxhandler.TextHandler,
+		ShowQRHandler: wxhandler.ShowQRHandler,
+	})
+	err := wxrobot.StartClient() //will be block
+	if err != nil {
+		log.Printf("wxrobot client err , err is : %s !", err.Error())
 	}
 
 }

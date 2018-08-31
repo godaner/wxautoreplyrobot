@@ -25,9 +25,7 @@ emailHost：邮箱服务器主机，如smtp.qq.com
 
 emailPort：邮箱主机端口，如465=5
 
-refreshWhenError：当程序出现错误时，重新打印登录二维码的间隔时间
-
-注：其中参数email、emailPassword、emailHost、emailPort在你不需要邮件通知的情况下可以不用填写，refreshWhenError默认120分钟，也可不用填写
+注：其中参数email、emailPassword、emailHost、emailPort在你不需要邮件通知的情况下可以不用填写
 ```
 
 
@@ -36,9 +34,9 @@ refreshWhenError：当程序出现错误时，重新打印登录二维码的间�
 
 ```
 cd ${GOPATH}/src/wxautoreplyrobot/cmd
-go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465 -refreshWhenError 120 godaner/wxautoreplyrobot
+go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465  godaner/wxautoreplyrobot
 如果你想后台运行:
-	nohup go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465 -refreshWhenError 120>wxautoreplyrobot.log 2>&1 & 
+	nohup go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465 >wxautoreplyrobot.log 2>&1 & 
 如果你想看日志:
 	tail -f wxautoreplyrobot.log
 ```
@@ -47,9 +45,9 @@ go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr
 
 ```
 docker pull godaber/wxautoreplyrobot
-docker run -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 -e refreshWhenError=120 --name wxautoreplyrobot godaner/wxautoreplyrobot
+docker run -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 --name wxautoreplyrobot godaner/wxautoreplyrobot
 如果你想后台运行:
-	docker run -d -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 -e refreshWhenError=120 --name wxautoreplyrobot godaner/wxautoreplyrobot
+	docker run -d -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 --name wxautoreplyrobot godaner/wxautoreplyrobot
 如果你想看日志:
 	docker logs -f wxautoreplyrobot
 ```
