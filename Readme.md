@@ -1,7 +1,7 @@
 ## 微信自动回复机器人-wxautoreplyrobot
-## Usage：
+## 用法：
 
-### 	download：
+### 	下载：
 
 ​		
 
@@ -10,35 +10,39 @@ cd ${GOPATH}/src
 git clone https://github.com/godaner/wxautoreplyrobot.git
 ```
 
-### 	run demo：
+### 	运行：
 
-#### linux：
+#### 解释：
+
+​	其中参数email、emailPassword、emailHost、emailPort在你不需要邮件通知的情况下可以不用填写
+
+#### 在linux上运行：
 
 ```
 cd ${GOPATH}/src/wxautoreplyrobot/cmd
 go run main.go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465 godaner/wxautoreplyrobot
-if you wanna run wxrobot in background:
+如果你想后台运行:
 	nohup go -textReplyPath ${GOPATH}/src/wxautoreplyrobot/textreply.cfg -addr :8887 -email  1138829***@qq.com -emailPassword 123 -emailHost smtp.qq.com -emailPort 465>wxautoreplyrobot.log 2>&1 & 
-if you wanna see log:
+如果你想看日志:
 	tail -f wxautoreplyrobot.log
 ```
 
-#### docker：
+#### 在docker上运行：
 
 ```
 docker pull godaber/wxautoreplyrobot
 docker run -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465  --name wxautoreplyrobot godaner/wxautoreplyrobot
-if you wanna run wxrobot in background:
+如果你想后台运行:
 	docker run -d -p 8887:8887 -e email="1138829222@qq.com" -e emailPassword="nofuhedsnzduibeb" -e emailHost="smtp.qq.com" -e emailPort=465 --name wxautoreplyrobot godaner/wxautoreplyrobot
-if you wanna see log:
+如果你想看日志:
 	docker logs -f wxautoreplyrobot
 ```
 
 
 
-### 	demo result：
+### 	运行结果：
 
-#### console:
+#### 控制台输出:
 
 ```
 2018/08/29 09:44:24 wx.go:104: Please open link in browser: https://login.weixin.qq.com/qrcode/IesWCyGxZg==
@@ -51,25 +55,27 @@ if you wanna see log:
 ......
 ```
 
-#### web:
+#### 访问程序管理页面:
 
-​	visit http://127.0.0.1:8887/reply/list to manage your reply msg.
+​	http://127.0.0.1:8887/reply/list
 
-### about textreply.cfg：
+用于管理恢复词条
 
-#### content：
+### 关于 textreply.cfg：
+
+#### 内容：
 
 ```
 [msg]
 hello: hello , i am godaner !
 ```
 
-#### explain：
+#### 解释：
 
 ```
-*.you don't need create this file , program will create it auto.
-*.it is a demo reply config
-*.don't change node [msg].
-*.if anyone send "hello" to you , your wxrobot will response "hello , i am godaner !" to him auto.
+*.你不需要手动创建此文件，系统将自己创建。
+*.这是一个类似于数据库的文件，用于储存恢复词条键值对。
+*.不要尝试手动修改该文件.
+*.例如：如果在微信中有任何人发送“hello”给你，机器人将自动回复“hello , i am godaner !”
 ```
 

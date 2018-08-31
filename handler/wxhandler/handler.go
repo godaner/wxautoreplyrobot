@@ -1,15 +1,15 @@
 package wxhandler
 
 import (
-	"fmt"
-	"github.com/larspensjo/config"
-	"wxautoreplyrobot"
-	"log"
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"github.com/godaner/wxrobot"
-	"gopkg.in/gomail.v2"
+	"github.com/larspensjo/config"
 	"github.com/pkg/errors"
+	"gopkg.in/gomail.v2"
+	"log"
+	"wxautoreplyrobot"
 )
 
 func TextHandler(msg *wxrobot.Message) error {
@@ -31,8 +31,8 @@ func TextHandler(msg *wxrobot.Message) error {
 
 	return wxrobot.SendMsg(msg.FromUserName, reply)
 }
-func ShowQRHandler(qrbyte []byte ) error{
-	if wxautoreplyrobot.Email == ""{
+func ShowQRHandler(qrbyte []byte) error {
+	if wxautoreplyrobot.Email == "" || wxautoreplyrobot.EmailPassword == "" || wxautoreplyrobot.EmailHost == "" || wxautoreplyrobot.EmailPort == 0 {
 		return nil
 	}
 	////qr page////
@@ -52,7 +52,7 @@ func ShowQRHandler(qrbyte []byte ) error{
 `
 	////qr email////
 
-	log.Printf("Sending qr emial to %s ...... ",wxautoreplyrobot.Email)
+	log.Printf("Sending qr emial to %s ...... ", wxautoreplyrobot.Email)
 
 	m := gomail.NewMessage()
 	// 发件人
@@ -67,11 +67,11 @@ func ShowQRHandler(qrbyte []byte ) error{
 	// 发送邮件服务器、端口、发件人账号、发件人密码
 	d := gomail.NewPlainDialer(wxautoreplyrobot.EmailHost, 465, wxautoreplyrobot.Email, wxautoreplyrobot.EmailPassword)
 	err := d.DialAndSend(m)
-	if  err != nil {
-		log.Printf("Send qr emial to %s err , err is : %s ! ",wxautoreplyrobot.Email,err.Error())
+	if err != nil {
+		log.Printf("Send qr emial to %s err , err is : %s ! ", wxautoreplyrobot.Email, err.Error())
 		return errors.Errorf("send email error")
-	}else {
-		log.Printf("Send qr emial to %s success ! ",wxautoreplyrobot.Email)
+	} else {
+		log.Printf("Send qr emial to %s success ! ", wxautoreplyrobot.Email)
 	}
 	return nil
 }

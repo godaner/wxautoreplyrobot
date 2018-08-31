@@ -55,7 +55,8 @@ func main() {
 			err := wxrobot.StartClient() //will be block
 			if err != nil {
 				log.Printf("wxrobot client err , err is : %s , time is %s !", err.Error(), time.Now().Format(TIME_LAYOUT))
-				time.Sleep(time.Minute*time.Duration(10))
+				log.Printf("wxrobot client will retry print qr after %d m , pleqase wait !",wxautoreplyrobot.RefreshWhenError)
+				time.Sleep(time.Minute*time.Duration(wxautoreplyrobot.RefreshWhenError))
 				continue
 			}
 			break
