@@ -43,11 +43,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:76fa3e58c135ca35b174c967430558354a301f55b7377f613314b92a629cefa3"
+  digest = "1:91a80f30308f260d3dc6e166fe2108e19fbbc6ba6b0ccff4c07ca0ccc077e06a"
   name = "github.com/godaner/wxrobot"
   packages = ["."]
   pruneopts = "UT"
-  revision = "f43ffa2594320ec6051a46bfbc9cb113bcf181bf"
+  revision = "671b4720ed5d145507a6a85a5a7217c249127282"
 
 [[projects]]
   branch = "master"
@@ -94,18 +94,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bf1cb2d456a753d515d90e43c4b05afa4837e75d7808d1752607b91007ce25bb"
-  name = "github.com/skip2/go-qrcode"
-  packages = [
-    ".",
-    "bitset",
-    "reedsolomon",
-  ]
-  pruneopts = "UT"
-  revision = "cf5f9fa2f0d847edb8e038db7ed975e239095e1a"
-
-[[projects]]
-  branch = "master"
   digest = "1:9ac241cddecd5a8f687864afd2896f8ada6b5d771c0976d64060ba86d66482e4"
   name = "github.com/tuotoo/qrcode"
   packages = ["."]
@@ -147,7 +135,7 @@
     "github.com/godaner/go-util",
     "github.com/godaner/wxrobot",
     "github.com/larspensjo/config",
-    "github.com/skip2/go-qrcode",
+    "github.com/pkg/errors",
     "gopkg.in/gomail.v2",
   ]
   solver-name = "gps-cdcl"
